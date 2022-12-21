@@ -98,3 +98,5 @@ def successfulUnsubscription(msg):
     users[i].isSubscribed = False
     save_data(users)
     bot.send_message(msg.chat.id, 'Вы отписались от рассылки расписания. Теперь Вам не будет приходить расписание.') 
+
+bot.infinity_polling()
