@@ -116,7 +116,7 @@ def successfulSubscription(msg):
     index = findUser(msg.from_user.id)
     users[i].isSubscribed = True
     save_data()
-    bot.send_message(msg.chat.id, 'Вы успешно зарегистрировались на рассылку расписания. Она происходит примерно между 19 и 20 часами каждый рабочий день.\n Если В ы зарегестрировались случайно, отправьте команду /unsubscribe.')
+    bot.send_message(msg.chat.id, 'Вы успешно зарегистрировались на рассылку расписания. Она происходит примерно между 19 и 20 часами каждый рабочий день.\n Если Вы зарегистрировались случайно, отправьте команду /unsubscribe.')
 
 @bot.message_handler(commands=['unsubscribe'])
 def successfulUnsubscription(msg):
