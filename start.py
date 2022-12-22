@@ -1,5 +1,14 @@
 import telebot
+import datetime
 
+class Date:
+    def __init(self, date):
+        date = date.split(' ')
+        date = date[0].split('.')
+        self.day = date[0]
+        self.month = date[1]
+        self.year = date[2]
+        
 class User:
     def __init__(self, userId, username, isSubscribed = False):
         self.userId = userId
@@ -78,8 +87,27 @@ def start(msg):
 def help(msg):
     users = check(msg.from_user.id, msg.from_user.username)
 
-    save_data()
-    bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldthewordisgg).')
+    bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldmethewordisgg).')
+    
+@bot.message_handler(commands=['website']) 
+def website(message):
+    users = check(msg.from_user.id, msg.from_user.username)
+    
+    markup = types.InlineKeyboardMarkup()
+    button1 = types.InlineKeyboardButton("Сайт", url='https://protvino-licey.edumsko.ru/')
+    markup.add(button1)
+    bot.send_message(message.chat.id, "Чтобы перейти на сайт Лицея, нажмите на эту кнопку", reply_markup=markup)
+    
+@bot.message_handler(commands=['menu']) 
+def menu(message):
+    users = check(msg.from_user.id, msg.from_user.username)
+    
+    markup = types.InlineKeyboardMarkup()
+    data = Date(str(datetime.datetime.today()))
+    link = 'https://protvino-licey.edumsko.ru/conditions/eating/menu/item/6665?date=' + data.day + '.' + data.month + '.' + data.year
+    button1 = types.InlineKeyboardButton("Меню", url=link)
+    markup.add(button1)
+    bot.send_message(message.chat.id, "Чтобы перейти на сайт Лицея, нажмите на кнопку", reply_markup=markup)
 
 @bot.message_handler(commands=['subscribe'])
 def successfulSubscription(msg):
@@ -97,6 +125,10 @@ def successfulUnsubscription(msg):
     index = findUser(msg.from_user.id)
     users[i].isSubscribed = False
     save_data()
-    bot.send_message(msg.chat.id, 'Вы отписались от рассылки расписания. Теперь Вам не будет приходить расписание.') 
+    bot.send_message(msg.chat.id, 'Вы отписались от рассылки расписания. Теперь Вам не будет приходить расписание.')
+    
+@bot.message_handler(content_types='text')
+def message_reply(message):
+    bot.send_message(msg.chat.id, 'Бот Вас не понял. Отправьте одну из команд бота')
 
 bot.infinity_polling()
