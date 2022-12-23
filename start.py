@@ -4,10 +4,10 @@ import datetime
 class Date:
     def __init(self, date):
         date = date.split(' ')
-        date = date[0].split('.')
-        self.day = date[0]
+        date = date[0].split('-')
+        self.day = date[2]
         self.month = date[1]
-        self.year = date[2]
+        self.year = date[0]
         
 class User:
     def __init__(self, userId, username, isSubscribed = False):
@@ -43,9 +43,10 @@ def reg(userId, username, isSubscribed = False):
 
 def save_data():
     f = open('users.py', 'w')
-    f.write(len(users))
+    f.write(str(len(users)))
     for user in users:
         f.write(f'{user.userId}:{user.username} {user.isSubscribed}')
+        f.write('\n')
     f.close()
 
 def isInUsers(userId, username):
@@ -63,7 +64,7 @@ def check(userId, username):
         save_data()
 
 def findUser(userId):
-    for i in range(len(users)-1):
+    for i in range(len(users)):
         if users[i].userId == userId:
             return i
             break
@@ -79,9 +80,9 @@ def start(msg):
     users = check(msg.from_user.id, msg.from_user.username)
     
     if msg.from_user.username != 'None':
-        bot.send_message(msg.chat.id, 'Приветствую Вас, {msg.from_user.first_name} {msg.from_user.last_name}(@{msg.from_user.username})! Это официальный бот МБОУ "Лицей" г.о.Протвино. Здесь есть множество функций, о которых Вы можете узнать, открыв меню в левом нижнем углу.')
+        bot.send_message(msg.chat.id, f'Приветствую Вас, {msg.from_user.first_name} {msg.from_user.last_name}(@{msg.from_user.username})! Это официальный бот МБОУ "Лицей" г.о.Протвино. Здесь есть множество функций, о которых Вы можете узнать, открыв меню в левом нижнем углу.')
     else:
-        bot.send_message(msg.chat.id, 'Приветствую Вас, {msg.from_user.first_name} {msg.from_user.last_name}! Это официальный бот МБОУ "Лицей" г.о.Протвино. Здесь есть множество функций, о которых Вы можете узнать, открыв меню в левом нижнем углу.')
+        bot.send_message(msg.chat.id, f'Приветствую Вас, {msg.from_user.first_name} {msg.from_user.last_name}! Это официальный бот МБОУ "Лицей" г.о.Протвино. Здесь есть множество функций, о которых Вы можете узнать, открыв меню в левом нижнем углу.')
 
 @bot.message_handler(commands=['help'])
 def help(msg):
@@ -114,7 +115,7 @@ def successfulSubscription(msg):
     users = check(msg.from_user.id, msg.from_user.username)
 
     index = findUser(msg.from_user.id)
-    users[i].isSubscribed = True
+    users[index].isSubscribed = True
     save_data()
     bot.send_message(msg.chat.id, 'Вы успешно зарегистрировались на рассылку расписания. Она происходит примерно между 19 и 20 часами каждый рабочий день.\n Если Вы зарегистрировались случайно, отправьте команду /unsubscribe.')
 
@@ -123,7 +124,7 @@ def successfulUnsubscription(msg):
     users = check(msg.from_user.id, msg.from_user.username)
 
     index = findUser(msg.from_user.id)
-    users[i].isSubscribed = False
+    users[index].isSubscribed = False
     save_data()
     bot.send_message(msg.chat.id, 'Вы отписались от рассылки расписания. Теперь Вам не будет приходить расписание.')
     
