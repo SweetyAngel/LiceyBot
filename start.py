@@ -77,7 +77,7 @@ users = users()
 
 @bot.message_handler(commands=['start'])
 def start(msg):
-    users = check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.username)
     
     if msg.from_user.username != 'None':
         bot.send_message(msg.chat.id, f'Приветствую Вас, {msg.from_user.first_name} {msg.from_user.last_name}(@{msg.from_user.username})! Это официальный бот МБОУ "Лицей" г.о.Протвино. Здесь есть множество функций, о которых Вы можете узнать, открыв меню в левом нижнем углу.')
@@ -86,13 +86,13 @@ def start(msg):
 
 @bot.message_handler(commands=['help'])
 def help(msg):
-    users = check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.username)
 
-    bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldmethewordisgg).')
+    bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldmetheworldisgg).')
     
 @bot.message_handler(commands=['website']) 
 def website(message):
-    users = check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.username)
     
     markup = types.InlineKeyboardMarkup()
     button1 = types.InlineKeyboardButton("Сайт", url='https://protvino-licey.edumsko.ru/')
@@ -101,7 +101,7 @@ def website(message):
     
 @bot.message_handler(commands=['menu']) 
 def menu(message):
-    users = check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.username)
     
     markup = types.InlineKeyboardMarkup()
     data = Date(str(datetime.datetime.today()))
@@ -112,16 +112,16 @@ def menu(message):
 
 @bot.message_handler(commands=['subscribe'])
 def successfulSubscription(msg):
-    users = check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.username)
 
     index = findUser(msg.from_user.id)
-    users[index].isSubscribed = True
+    users[index].subscribe()
     save_data()
     bot.send_message(msg.chat.id, 'Вы успешно зарегистрировались на рассылку расписания. Она происходит примерно между 19 и 20 часами каждый рабочий день.\n Если Вы зарегистрировались случайно, отправьте команду /unsubscribe.')
 
 @bot.message_handler(commands=['unsubscribe'])
 def successfulUnsubscription(msg):
-    users = check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.username)
 
     index = findUser(msg.from_user.id)
     users[index].isSubscribed = False
@@ -130,6 +130,8 @@ def successfulUnsubscription(msg):
     
 @bot.message_handler(content_types='text')
 def message_reply(message):
+    check(msg.from_user.id, msg.from_user.username)
+    
     bot.send_message(msg.chat.id, 'Бот Вас не понял. Отправьте одну из команд бота')
 
 bot.infinity_polling()
