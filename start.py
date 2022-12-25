@@ -1,8 +1,8 @@
 import telebot
 import datetime
-
+from telebot import types
 class Date:
-    def __init(self, date):
+    def __init__(self, date):
         date = date.split(' ')
         date = date[0].split('-')
         self.day = date[2]
@@ -26,7 +26,7 @@ def users():
     countOfUsers = int(f.readline())
     users = []
     
-    for i in range(countOfUsers-1):
+    for i in range(countOfUsers):
         user = f.readline().split(':')
         userId = user[0]
         params = user[1].split(' ')
@@ -101,14 +101,14 @@ def website(message):
     
 @bot.message_handler(commands=['menu']) 
 def menu(message):
-    check(msg.from_user.id, msg.from_user.username)
+    check(messsge.from_user.id, message.from_user.username)
     
     markup = types.InlineKeyboardMarkup()
     data = Date(str(datetime.datetime.today()))
     link = 'https://protvino-licey.edumsko.ru/conditions/eating/menu/item/6665?date=' + data.day + '.' + data.month + '.' + data.year
     button1 = types.InlineKeyboardButton("Меню", url=link)
     markup.add(button1)
-    bot.send_message(message.chat.id, "Чтобы перейти на сайт Лицея, нажмите на кнопку", reply_markup=markup)
+    bot.send_message(message.chat.id, "Нажмите на кнопку, чтобы узнать меню на сегодня", reply_markup=markup)
 
 @bot.message_handler(commands=['subscribe'])
 def successfulSubscription(msg):
