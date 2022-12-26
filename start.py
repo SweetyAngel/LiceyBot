@@ -35,7 +35,7 @@ def users():
         userId = user[0]
         params = user[1].split(' ')
         firstName = params[0]
-        seconName = params[1]
+        secondName = params[1]
         username = params[2]
         isSubscribed = params[3]
         users.append(User(userId, firstName, secondName, username, isSubscribed))
@@ -51,7 +51,7 @@ def save_data():
     f = open('users.py', 'w')
     f.write(str(len(users)))
     for user in users:
-        f.write(f'/n{user.userId}:{user.firstName} {user.secondName} {user.username} {user.isSubscribed}')
+        f.write(f'\n{user.userId}:{user.firstName} {user.secondName} {user.username} {user.isSubscribed}')
     f.close()
 
 def isInUsers(userId, firstName, secondName, username):
@@ -147,7 +147,7 @@ def start(m):
     bot.send_message(m.from_user.id, "Привет!!!", reply_markup = markup)
     
 @bot.message_handler(content_types='text')
-def message_reply(message):
+def message_reply(msg):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     bot.send_message(msg.chat.id, 'Бот Вас не понял. Отправьте одну из команд бота')
