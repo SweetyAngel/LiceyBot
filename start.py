@@ -1,6 +1,7 @@
 import telebot
 import datetime
 from telebot import types
+
 class Date:
     def __init__(self, date):
         date = date.split(' ')
@@ -10,8 +11,10 @@ class Date:
         self.year = date[0]
         
 class User:
-    def __init__(self, userId, username, isSubscribed = False):
+    def __init__(self, userId, firstName, secondName, username, isSubscribed = False):
         self.userId = userId
+        self.firstName = firstName
+        self.secondName = secondName
         self.username = username
         self.isSubscribed = isSubscribed
 
@@ -30,37 +33,40 @@ def users():
         user = f.readline().split(':')
         userId = user[0]
         params = user[1].split(' ')
-        username = params[0]
-        isSubscribed = params[1]
-        users.append(User(userId, username, isSubscribed))
+        firstName = params[0]
+        seconName = params[1]
+        username = params[2]
+        isSubscribed = params[3]
+        users.append(User(userId, firstName, secondName, username, isSubscribed))
                      
     f.close()
                      
     return users
 
-def reg(userId, username, isSubscribed = False):
-    users.append(User(userId, username, isSubscribed))
+def reg(userId, firstName, secondName, username, isSubscribed = False):
+    users.append(User(userId, firstName, secondName, username, isSubscribed))
 
 def save_data():
     f = open('users.py', 'w')
     f.write(str(len(users)))
     for user in users:
-        f.write(f'{user.userId}:{user.username} {user.isSubscribed}')
-        f.write('\n')
+        f.write(f'/n{user.userId}:{user.firstName} {user.secondName} {user.username} {user.isSubscribed}')
     f.close()
 
-def isInUsers(userId, username):
+def isInUsers(userId, firstName, secondName, username):
     for user in users:
         if user.userId == userId:
+            user.firstName = firstName
+            user.secondName = secondName
             user.username = username
             save_data()
             return True
             break
     return False
 
-def check(userId, username):
-    if not isInUsers(userId, username):
-        reg(userId, username)
+def check(userId, firstName, secondName, username):
+    if not isInUsers(userId, firstName, secondName, username):
+        reg(userId, firstName, secondName, username)
         save_data()
 
 def findUser(userId):
@@ -77,7 +83,7 @@ users = users()
 
 @bot.message_handler(commands=['start'])
 def start(msg):
-    check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     if msg.from_user.username != 'None':
         bot.send_message(msg.chat.id, f'Приветствую Вас, {msg.from_user.first_name} {msg.from_user.last_name}(@{msg.from_user.username})! Это официальный бот МБОУ "Лицей" г.о.Протвино. Здесь есть множество функций, о которых Вы можете узнать, открыв меню в левом нижнем углу.')
@@ -86,13 +92,13 @@ def start(msg):
 
 @bot.message_handler(commands=['help'])
 def help(msg):
-    check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
 
     bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldmetheworldisgg).')
     
 @bot.message_handler(commands=['website']) 
 def website(message):
-    check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     markup = types.InlineKeyboardMarkup()
     button1 = types.InlineKeyboardButton("Сайт", url='https://protvino-licey.edumsko.ru/')
@@ -101,7 +107,7 @@ def website(message):
     
 @bot.message_handler(commands=['menu']) 
 def menu(message):
-    check(messsge.from_user.id, message.from_user.username)
+    check(messsge.from_user.id, msg.from_user.first_name, msg.from_user.last_name, message.from_user.username)
     
     markup = types.InlineKeyboardMarkup()
     data = Date(str(datetime.datetime.today()))
@@ -112,7 +118,7 @@ def menu(message):
 
 @bot.message_handler(commands=['subscribe'])
 def successfulSubscription(msg):
-    check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
 
     index = findUser(msg.from_user.id)
     users[index].subscribe()
@@ -121,7 +127,7 @@ def successfulSubscription(msg):
 
 @bot.message_handler(commands=['unsubscribe'])
 def successfulUnsubscription(msg):
-    check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
 
     index = findUser(msg.from_user.id)
     users[index].isSubscribed = False
@@ -130,7 +136,7 @@ def successfulUnsubscription(msg):
     
 @bot.message_handler(content_types='text')
 def message_reply(message):
-    check(msg.from_user.id, msg.from_user.username)
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     bot.send_message(msg.chat.id, 'Бот Вас не понял. Отправьте одну из команд бота')
 
