@@ -1,4 +1,5 @@
 import json
+import threading as thr
 import telebot
 import datetime
 from telebot import types
@@ -22,8 +23,25 @@ class User:
     def subscribe(self):
         self.isSubscribed = True
         
-global users
+global users, thrs
 
+def start():
+    for thread in thrs:
+        thread.start()
+
+#Send schedule
+def timer(bot):
+    time = datetime.datetime.now().strftime("%H:%M:%S")
+    
+    if time.split(':')[0]>=17 and time.split(':')[0]<=22:
+        for user in users:
+            bot.send_document(user.userId, open('NAME_OF_FILE', 'rb'))
+            
+#It doesn't work yet            
+#timerThr = thr.Thread(target=timer, args=bot)
+#thrs.append(timerThr)
+
+#Getting list of users
 def users():
     f = open('users.py', 'r')
     
@@ -44,9 +62,11 @@ def users():
                      
     return users
 
+#Add users in users
 def reg(userId, firstName, secondName, username, isSubscribed = False):
     users.append(User(userId, firstName, secondName, username, isSubscribed))
 
+#Save users in users.py
 def save_data():
     f = open('users.py', 'w')
     f.write(str(len(users)))
@@ -54,6 +74,7 @@ def save_data():
         f.write(f'\n{user.userId}:{user.firstName} {user.secondName} {user.username} {user.isSubscribed}')
     f.close()
 
+#Check if users exists in users
 def isInUsers(userId, firstName, secondName, username):
     for user in users:
         if user.userId == userId:
@@ -65,11 +86,13 @@ def isInUsers(userId, firstName, secondName, username):
             break
     return False
 
+#Reg users if he is not in users
 def check(userId, firstName, secondName, username):
     if not isInUsers(userId, firstName, secondName, username):
         reg(userId, firstName, secondName, username)
         save_data()
 
+#Find user in user
 def findUser(userId):
     for i in range(len(users)):
         if users[i].userId == userId:
@@ -83,7 +106,7 @@ bot = telebot.TeleBot(token)
 users = users()
 
 @bot.message_handler(commands=['start'])
-def start(msg):
+def start_msg(msg):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     if msg.from_user.username != 'None':
@@ -179,4 +202,7 @@ def callback_query(call):
                            types.InlineKeyboardButton(text=f'Вперёд --->', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page+1) + ",\"CountPage\":" + str(count) + "}"))
         bot.edit_message_text(f'Страница {page} из {count}', reply_markup = markup, chat_id=call.message.chat.id, message_id=call.message.message_id)
 
-bot.infinity_polling()
+mainThr = thr.Thread(target=bot.infinity_polling, args=())
+thrs.append(mainThr)
+
+start()
