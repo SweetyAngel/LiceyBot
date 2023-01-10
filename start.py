@@ -48,10 +48,10 @@ def users():
     countOfUsers = int(f.readline())
     users = []
     
-    for i in range(countOfUsers):
+    for _ in range(countOfUsers):
         user = f.readline().split(':')
         userId = user[0]
-        params = user[1].split(' ')
+        params = user[1].split('\n')[0].split(' ')
         firstName = params[0]
         secondName = params[1]
         username = params[2]
@@ -106,7 +106,7 @@ bot = telebot.TeleBot(token)
 users = users()
 
 @bot.message_handler(commands=['start'])
-def start_msg(msg):
+def start(msg):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     if msg.from_user.username != 'None':
@@ -121,24 +121,24 @@ def help(msg):
     bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldmetheworldisgg).')
     
 @bot.message_handler(commands=['website']) 
-def website(message):
+def website(msg):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     markup = types.InlineKeyboardMarkup()
     button1 = types.InlineKeyboardButton("Сайт", url='https://protvino-licey.edumsko.ru/')
     markup.add(button1)
-    bot.send_message(message.chat.id, "Чтобы перейти на сайт Лицея, нажмите на эту кнопку", reply_markup=markup)
+    bot.send_message(msg.chat.id, "Чтобы перейти на сайт Лицея, нажмите на эту кнопку", reply_markup=markup)
     
 @bot.message_handler(commands=['menu']) 
-def menu(message):
-    check(messsge.from_user.id, msg.from_user.first_name, msg.from_user.last_name, message.from_user.username)
+def menu(msg):
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username)
     
     markup = types.InlineKeyboardMarkup()
     data = Date(str(datetime.datetime.today()))
     link = 'https://protvino-licey.edumsko.ru/conditions/eating/menu/item/6665?date=' + data.day + '.' + data.month + '.' + data.year
     button1 = types.InlineKeyboardButton("Меню", url=link)
     markup.add(button1)
-    bot.send_message(message.chat.id, "Нажмите на кнопку, чтобы узнать меню на сегодня", reply_markup=markup)
+    bot.send_message(msg.chat.id, "Нажмите на кнопку, чтобы узнать меню на сегодня", reply_markup=markup)
 
 @bot.message_handler(commands=['subscribe'])
 def successfulSubscription(msg):
@@ -188,18 +188,11 @@ def callback_query(call):
         markup.add(types.InlineKeyboardButton(text='Скрыть', callback_data='unseen'))
         if page == 1:
             markup.add(types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '),
-                       types.InlineKeyboardButton(text=f'Вперёд --->',
-                                            callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(
-                                                page + 1) + ",\"CountPage\":" + str(count) + "}"))
+                       types.InlineKeyboardButton(text=f'Вперёд --->', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page + 1) + ",\"CountPage\":" + str(count) + "}"))
         elif page == count:
-            markup.add(types.InlineKeyboardButton(text=f'<--- Назад',
-                                            callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(
-                                                page - 1) + ",\"CountPage\":" + str(count) + "}"),
-                       types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '))
+            markup.add(types.InlineKeyboardButton(text=f'<--- Назад', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page - 1) + ",\"CountPage\":" + str(count) + "}"), types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '))
         else:
-            markup.add(types.InlineKeyboardButton(text=f'<--- Назад', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page-1) + ",\"CountPage\":" + str(count) + "}"),
-                           types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '),
-                           types.InlineKeyboardButton(text=f'Вперёд --->', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page+1) + ",\"CountPage\":" + str(count) + "}"))
+            markup.add(types.InlineKeyboardButton(text=f'<--- Назад', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page-1) + ",\"CountPage\":" + str(count) + "}"), types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '), types.InlineKeyboardButton(text=f'Вперёд --->', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page+1) + ",\"CountPage\":" + str(count) + "}"))
         bot.edit_message_text(f'Страница {page} из {count}', reply_markup = markup, chat_id=call.message.chat.id, message_id=call.message.message_id)
 
 mainThr = thr.Thread(target=bot.infinity_polling, args=())
