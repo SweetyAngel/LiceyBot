@@ -69,27 +69,32 @@ def users():
 
 #Add users in users
 def reg(id, name, surname, username, is_subscribed, is_admin, last_message, last_check):
-    users.append(User(id, name, surname, username, is_subscribed, is_admin, last_message, last_check))
-
-#Save users in users.py
-def save_data():
-    cursor.execute("DELETE FROM users;")
-    conn.commit()
-    for user in users:
-        phr = "INSERT INTO users VALUES (" + user.id + ", '" + user.name + "', '" + user.surname + "', " + user.is_subscribed + ", " + user.is_admin + ", '" + user.last_message + "', '" + user.last_check + "');"
-        cursor.execute(phr)
-
+    user = User(id, name, surname, username, is_subscribed, is_admin, last_message, last_check)
+    users.append(user)
+    phr = "INSERT INTO users VALUES (" + str(user.id) + ", '" + user.name + "', '" + user.surname + "', " + str(user.is_subscribed) + ", " + str(user.is_admin) + ", '" + user.last_message + "', '" + user.last_check + "');"
+    cursor.execute(phr)
+    
+#Updates inf
+def update(user, name, surname, username, last_message, last_check):
+    if user.name != name:
+        cursor.execute("UPDATE users SET Name=" + name + " WHEN id=" + str(user.id) + ";")
+    if user.surname != surname:
+        cursor.execute("UPDATE users SET Surname=" + name + " WHEN id=" + str(user.id) + ";")
+    if user.username != username:
+        cursor.execute("UPDATE users SET Username=" + username + " WHEN id=" + str(user.id) + ";")
+    cursor.execute("UPDATE users SET Last_message=" + last_message + " WHEN id=" + str(user.id) + ";")
+    cursor.execute("UPDATE users SET Last_check=" + last_check + " WHEN id=" + str(user.id) + ";")
         
 #Check if users exists in users
 def isInUsers(id, name, surname, username, is_admin, last_message, last_check):
     for user in users:
         if user.id == id:
+            update(user, name, surname, username, last_message, last_check)
             user.name = name
             user.surname = surname
             user.username = username
             user.last_message = last_message
             user.last_check = last_check
-            save_data()
             return True
             break
     return False
@@ -98,7 +103,6 @@ def isInUsers(id, name, surname, username, is_admin, last_message, last_check):
 def check(id, name, surname, username, is_admin, last_message, last_check):
     if not isInUsers(id, name, surname, username, is_admin, last_message, last_check):
         reg(id, name, surname, username, is_admin, last_message, last_check)
-        save_data()
 
 #Find user in users
 def findUserid):
@@ -156,7 +160,6 @@ def subscribe(msg):
 
     index = findUser(msg.from_user.id)
     users[index].subscribe()
-    save_data()
     bot.send_message(msg.chat.id, 'Вы успешно зарегистрировались на рассылку расписания. Она происходит примерно между 19 и 20 часами каждый рабочий день.\n Если Вы зарегистрировались случайно, отправьте команду /unsubscribe.')
 
 @bot.message_handler(commands=['unsubscribe'])
@@ -165,11 +168,12 @@ def unsubscribe(msg):
 
     index = findUser(msg.from_user.id)
     users[index].isSubscribed = False
-    save_data()
     bot.send_message(msg.chat.id, 'Вы отписались от рассылки расписания. Теперь Вам не будет приходить расписание.')
 
 @bot.message_handler(commands=['text'])
 def start(m):
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    
     count = 10
     page = 1
     markup = types.InlineKeyboardMarkup()
