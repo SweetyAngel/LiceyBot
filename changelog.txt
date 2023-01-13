@@ -1,3 +1,8 @@
+1.0.1 (13.01.23)
+
+- Now users are being updated, not saved every time
+- There is no function save_data(), there is update()
+
 1.0.0 (13.01.23)
 
 - Users are now saved in sqlite database, not in users.py
