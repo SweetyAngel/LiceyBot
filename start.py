@@ -34,6 +34,9 @@ class User:
         
 global users, thrs, conn, cursor
 
+conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
+cursor = conn.cursor()
+
 def start():
     for thread in thrs:
         thread.start()
@@ -71,7 +74,7 @@ def users():
 def reg(id, name, surname, username, is_subscribed, is_admin, last_message, last_check):
     user = User(id, name, surname, username, is_subscribed, is_admin, last_message, last_check)
     users.append(user)
-    phr = "INSERT INTO users VALUES (" + str(user.id) + ", '" + user.name + "', '" + user.surname + "', " + str(user.is_subscribed) + ", " + str(user.is_admin) + ", '" + user.last_message + "', '" + user.last_check + "');"
+    phr = "INSERT INTO users VALUES (" + str(user.id) + ", '" + user.name + "', '" + user.surname + "', '" + user.userrname + "', " + str(user.is_subscribed) + ", " + str(user.is_admin) + ", '" + user.last_message + "', '" + str(user.last_check) + "');"
     cursor.execute(phr)
     
 #Updates inf
@@ -121,7 +124,7 @@ cursor = conn.cursor()
 
 @bot.message_handler(commands=['start'])
 def start(msg):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     if msg.from_user.username != 'None':
         bot.send_message(msg.chat.id, f'Приветствую Вас, {msg.from_user.first_name} {msg.from_user.last_name}(@{msg.from_user.username})! Это официальный бот МБОУ "Лицей" г.о.Протвино. Здесь есть множество функций, о которых Вы можете узнать, открыв меню в левом нижнем углу.')
@@ -130,13 +133,13 @@ def start(msg):
 
 @bot.message_handler(commands=['help'])
 def help(msg):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
 
     bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldmetheworldisgg).')
     
 @bot.message_handler(commands=['website']) 
 def website(msg):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     markup = types.InlineKeyboardMarkup()
     button1 = types.InlineKeyboardButton("Сайт", url='https://protvino-licey.edumsko.ru/')
@@ -145,7 +148,7 @@ def website(msg):
     
 @bot.message_handler(commands=['menu']) 
 def menu(msg):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     markup = types.InlineKeyboardMarkup()
     data = Date(str(datetime.datetime.today()))
@@ -156,7 +159,7 @@ def menu(msg):
 
 @bot.message_handler(commands=['subscribe'])
 def subscribe(msg):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
 
     index = findUser(msg.from_user.id)
     users[index].subscribe()
@@ -164,7 +167,7 @@ def subscribe(msg):
 
 @bot.message_handler(commands=['unsubscribe'])
 def unsubscribe(msg):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
 
     index = findUser(msg.from_user.id)
     users[index].isSubscribed = False
@@ -172,7 +175,7 @@ def unsubscribe(msg):
 
 @bot.message_handler(commands=['text'])
 def start(m):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     count = 10
     page = 1
@@ -185,7 +188,7 @@ def start(m):
     
 @bot.message_handler(content_types='text')
 def message_reply(msg):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, False, msg.text, datetime.datetime.now())
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     bot.send_message(msg.chat.id, 'Бот Вас не понял. Отправьте одну из команд бота')
     
