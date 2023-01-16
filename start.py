@@ -26,20 +26,28 @@ class User:
 
     def subscribe(self):
         phr = "UPDATE users SET Is_subscribed=1 WHERE Id=" + str(user.id)
+        conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
+        cursor = conn.cursor()
         cursor.execute(phr)
+        conn.commit()
+        conn.close()
         
     def unsubscribe(self):
         phr = "UPDATE users SET Is_subscribed=0 WHERE Id=" + str(user.id)
+        conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
+        cursor = conn.cursor()
         cursor.execute(phr)
+        conn.commit()
+        conn.close()
         
-global users, thrs, conn, cursor
+global users, thrs
 
-conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
-cursor = conn.cursor()
+
 
 def start():
     for thread in thrs:
         thread.start()
+    
 
 #Send schedule
 def timer(bot):
@@ -56,6 +64,9 @@ def timer(bot):
 #Getting list of users
 def users():
     users = []
+    conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Users")
     all = cursor.fetchall()
     for i in range (len(all)):
         id = int(all[i][0])
@@ -66,27 +77,44 @@ def users():
         is_admin = str(bool(all[i][5]))
         last_message = all[i][6]
         last_check = all[i][7]
-        reg(id, name, surname, username, is_subscribed, is_admin, last_message, last_check)
+        users.append(User(id, name, surname, username, is_subscribed, is_admin, last_message, last_check = datetime.datetime.now()))
+        
+    conn.close()
                      
     return users
 
 #Add users in users
-def reg(id, name, surname, username, is_subscribed, is_admin, last_message, last_check):
-    user = User(id, name, surname, username, is_subscribed, is_admin, last_message, last_check)
+def reg(id, name, surname, username, is_admin, last_message, last_check):
+    user = User(id, name, surname, username, False, is_admin, last_message, last_check)
     users.append(user)
-    phr = "INSERT INTO users VALUES (" + str(user.id) + ", '" + user.name + "', '" + user.surname + "', '" + user.userrname + "', " + str(user.is_subscribed) + ", " + str(user.is_admin) + ", '" + user.last_message + "', '" + str(user.last_check) + "');"
+    phr = "INSERT INTO users VALUES (" + str(user.id) + ", '" + user.name + "', '" + user.surname + "', '" + user.username + "', " + str(user.is_subscribed) + ", " + str(user.is_admin) + ", '" + user.last_message + "', '" + str(user.last_check) + "');"
+    conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
+    cursor = conn.cursor()
     cursor.execute(phr)
+    conn.commit()
+    conn.close()
     
 #Updates inf
 def update(user, name, surname, username, last_message, last_check):
+    conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
+    cursor = conn.cursor()
+        
+        
     if user.name != name:
-        cursor.execute("UPDATE users SET Name=" + name + " WHEN id=" + str(user.id) + ";")
+        cursor.execute("UPDATE users SET Name='" + name + "' WHERE id=" + str(user.id) + ";")
+        conn.commit()
     if user.surname != surname:
-        cursor.execute("UPDATE users SET Surname=" + name + " WHEN id=" + str(user.id) + ";")
+        cursor.execute("UPDATE users SET Surname='" + surname + "' WHERE id=" + str(user.id) + ";")
+        conn.commit()
     if user.username != username:
-        cursor.execute("UPDATE users SET Username=" + username + " WHEN id=" + str(user.id) + ";")
-    cursor.execute("UPDATE users SET Last_message=" + last_message + " WHEN id=" + str(user.id) + ";")
-    cursor.execute("UPDATE users SET Last_check=" + last_check + " WHEN id=" + str(user.id) + ";")
+        cursor.execute("UPDATE users SET Username='" + username + "' WHERE id=" + str(user.id) + ";")
+        conn.commit()
+    cursor.execute("UPDATE users SET Last_message='" + last_message + "' WHERE id=" + str(user.id) + ";")
+    conn.commit()
+    cursor.execute("UPDATE users SET Last_check='" + last_check + "' WHERE id=" + str(user.id) + ";")
+    conn.commit()
+    
+    conn.close()
         
 #Check if users exists in users
 def isInUsers(id, name, surname, username, is_admin, last_message, last_check):
@@ -108,7 +136,7 @@ def check(id, name, surname, username, is_admin, last_message, last_check):
         reg(id, name, surname, username, is_admin, last_message, last_check)
 
 #Find user in users
-def findUserid):
+def findUser(id):
     for i in range(len(users)):
         if users[i].id == id:
             return i
@@ -119,11 +147,9 @@ token = ''
 bot = telebot.TeleBot(token)
 
 users = users()
-conn = sqlite3.connect('bot.sqlite')
-cursor = conn.cursor()
 
 @bot.message_handler(commands=['start'])
-def start(msg):
+def startMsg(msg):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     if msg.from_user.username != 'None':
@@ -174,7 +200,7 @@ def unsubscribe(msg):
     bot.send_message(msg.chat.id, 'Вы отписались от рассылки расписания. Теперь Вам не будет приходить расписание.')
 
 @bot.message_handler(commands=['text'])
-def start(m):
+def startText(m):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     count = 10
