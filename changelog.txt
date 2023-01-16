@@ -1,3 +1,8 @@
+1.0.3 (16.01.23)
+
+- Fixed users list getting
+- Renamed and fixed some methods
+
 1.0.2 (15.01.23)
 
 - Fixed method check
