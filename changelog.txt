@@ -1,3 +1,9 @@
+1.0.4 (17.01.23)
+
+- Fixed method startText()
+- Added thrs = []
+- Bot is ready for live.
+
 1.0.3 (17.01.23) (alpha)
 
 - Fixed methods subscribe(), unsubscribe(), timer()
