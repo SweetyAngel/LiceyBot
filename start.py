@@ -42,7 +42,7 @@ class User:
         
 global users, thrs
 
-
+thrs = []
 
 def start():
     for thread in thrs:
@@ -201,7 +201,7 @@ def unsubscribe(msg):
 
 @bot.message_handler(commands=['text'])
 def startText(m):
-    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
+    check(m.from_user.id, m.from_user.first_name, m.from_user.last_name, m.from_user.username, False, m.text, datetime.datetime.now())
     
     count = 10
     page = 1
