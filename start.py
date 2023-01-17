@@ -25,7 +25,7 @@ class User:
         self.last_check = last_check
 
     def subscribe(self):
-        phr = "UPDATE users SET Is_subscribed=1 WHERE Id=" + str(user.id)
+        phr = "UPDATE users SET Is_subscribed=1 WHERE Id=" + str(self.id)
         conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
         cursor = conn.cursor()
         cursor.execute(phr)
@@ -33,7 +33,7 @@ class User:
         conn.close()
         
     def unsubscribe(self):
-        phr = "UPDATE users SET Is_subscribed=0 WHERE Id=" + str(user.id)
+        phr = "UPDATE users SET Is_subscribed=0 WHERE Id=" + str(self.id)
         conn = sqlite3.connect('bot.sqlite', check_same_thread = False)
         cursor = conn.cursor()
         cursor.execute(phr)
@@ -55,7 +55,7 @@ def timer(bot):
     
     if time.split(':')[0]>=17 and time.split(':')[0]<=22:
         for user in users:
-            bot.send_document(user.userId, open('NAME_OF_FILE', 'rb'))
+            bot.send_document(user.id, open('NAME_OF_FILE', 'rb'))
             
 #It doesn't work yet            
 #timerThr = thr.Thread(target=timer, args=bot)
