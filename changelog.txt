@@ -1,3 +1,7 @@
+1.0.3 (17.01.23) (alpha)
+
+- Fixed methods subscribe(), unsubscribe(), timer()
+
 1.0.3 (16.01.23)
 
 - Fixed users list getting
