@@ -161,7 +161,7 @@ def startMsg(msg):
 def help(msg):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
 
-    bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@somebodyoncetoldmetheworldisgg).')
+    bot.send_message(msg.chat.id, 'Все вопросы главному разработчику в личные сообщения\n Контакты - Гороховский Альберт(@iskatelonelove).')
     
 @bot.message_handler(commands=['website']) 
 def website(msg):
@@ -212,11 +212,24 @@ def startText(m):
 
     bot.send_message(m.from_user.id, "Привет!!!", reply_markup = markup)
     
-@bot.message_handler(content_types='text')
+@bot.message_handler(content_types=['text'])
 def message_reply(msg):
     check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, msg.text, datetime.datetime.now())
     
     bot.send_message(msg.chat.id, 'Бот Вас не понял. Отправьте одну из команд бота')
+    
+@bot.message_handler(content_types=['document'])
+def sch(msg):
+    check(msg.from_user.id, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.username, False, 'Document', datetime.datetime.now())
+    if users[findUser(msg.from_user.id)].is_admin:
+        for user in users:
+            if user.is_subscribed:
+                bot.send_message(user.id, 'А вот и расписание на завтра!')
+                bot.forward_message(user.id, msg.chat.id, msg.message_id)
+            else:
+                bot.send_message(user.id, 'Пришло расписание! Но вы не подписаны, поэтому вам не оно не отправлено. Подпишитесь, и тогда завтра вы его получите!')
+    else:
+        bot.send_message(msg.from_user.id, 'Вы не админ:( Если это произошло по ошибке, обратитесь ко мне - @iskatelonelove')
     
 @bot.callback_query_handler(func=lambda call:True)
 def callback_query(call):
