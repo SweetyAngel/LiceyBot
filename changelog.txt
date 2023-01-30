@@ -1,3 +1,8 @@
+1.0.5 (30.01.23)
+
+- Fixed command "/help"
+- Added document getting
+
 1.0.4 (17.01.23)
 
 - Fixed method startText()
