@@ -49,18 +49,6 @@ def start():
         thread.start()
     
 
-#Send schedule
-def timer(bot):
-    time = datetime.datetime.now().strftime("%H:%M:%S")
-    
-    if time.split(':')[0]>=17 and time.split(':')[0]<=22:
-        for user in users:
-            bot.send_document(user.id, open('NAME_OF_FILE', 'rb'))
-            
-#It doesn't work yet            
-#timerThr = thr.Thread(target=timer, args=bot)
-#thrs.append(timerThr)
-
 #Getting list of users
 def users():
     users = []
