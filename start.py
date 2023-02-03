@@ -1,4 +1,3 @@
-import json
 import sqlite3
 import threading as thr
 import telebot
@@ -186,19 +185,6 @@ def unsubscribe(msg):
     index = findUser(msg.from_user.id)
     users[index].isSubscribed = False
     bot.send_message(msg.chat.id, 'Вы отписались от рассылки расписания. Теперь Вам не будет приходить расписание.')
-
-@bot.message_handler(commands=['text'])
-def startText(m):
-    check(m.from_user.id, m.from_user.first_name, m.from_user.last_name, m.from_user.username, False, m.text, datetime.datetime.now())
-    
-    count = 10
-    page = 1
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton(text='Скрыть', callback_data='unseen'))
-    markup.add(types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '),
-               types.InlineKeyboardButton(text=f'Вперёд --->', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page+1) + ",\"CountPage\":" + str(count) + "}"))
-
-    bot.send_message(m.from_user.id, "Привет!!!", reply_markup = markup)
     
 @bot.message_handler(content_types=['text'])
 def message_reply(msg):
@@ -218,26 +204,7 @@ def sch(msg):
                 bot.send_message(user.id, 'Пришло расписание! Но вы не подписаны, поэтому вам не оно не отправлено. Подпишитесь, и тогда завтра вы его получите!')
     else:
         bot.send_message(msg.from_user.id, 'Вы не админ:( Если это произошло по ошибке, обратитесь ко мне - @iskatelonelove')
-    
-@bot.callback_query_handler(func=lambda call:True)
-def callback_query(call):
-    req = call.data.split('_')
-    if req[0] == 'unseen':
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-    elif 'pagination' in req[0]:
-        json_string = json.loads(req[0])
-        count = json_string['CountPage']
-        page = json_string['NumberPage']
-        markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton(text='Скрыть', callback_data='unseen'))
-        if page == 1:
-            markup.add(types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '),
-                       types.InlineKeyboardButton(text=f'Вперёд --->', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page + 1) + ",\"CountPage\":" + str(count) + "}"))
-        elif page == count:
-            markup.add(types.InlineKeyboardButton(text=f'<--- Назад', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page - 1) + ",\"CountPage\":" + str(count) + "}"), types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '))
-        else:
-            markup.add(types.InlineKeyboardButton(text=f'<--- Назад', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page-1) + ",\"CountPage\":" + str(count) + "}"), types.InlineKeyboardButton(text=f'{page}/{count}', callback_data=f' '), types.InlineKeyboardButton(text=f'Вперёд --->', callback_data="{\"method\":\"pagination\",\"NumberPage\":" + str(page+1) + ",\"CountPage\":" + str(count) + "}"))
-        bot.edit_message_text(f'Страница {page} из {count}', reply_markup = markup, chat_id=call.message.chat.id, message_id=call.message.message_id)
+   
 
 mainThr = thr.Thread(target=bot.infinity_polling, args=())
 thrs.append(mainThr)
